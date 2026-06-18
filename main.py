@@ -59,8 +59,8 @@ def main():
     # Print banner
     print_banner()
     
-    print(f"{Fore.YELLOW}🎯 Target Domain: {Fore.WHITE}{args.domain}")
-    print(f"{Fore.YELLOW}📋 Starting scan...{Style.RESET_ALL}\n")
+    print(f"{Fore.YELLOW} Target Domain: {Fore.WHITE}{args.domain}")
+    print(f"{Fore.YELLOW} Starting scan...{Style.RESET_ALL}\n")
     
     # Initialize results dictionary
     results = {
@@ -76,24 +76,24 @@ def main():
     # TODO: Call each module here
     # We'll implement these in the coming days
     
-    print(f"\n{Fore.GREEN}✅ Scan completed!")
-    print(f"{Fore.YELLOW}📄 Generating report...")
+    print(f"\n{Fore.GREEN} Scan completed!")
+    print(f"{Fore.YELLOW} Generating report...")
     
     # Generate report
     output_file = args.output or f"reports/{args.domain}_report.html"
     generate_report(results, output_file)
     
-    print(f"{Fore.GREEN}✅ Report saved to: {Fore.WHITE}{output_file}")
-    print(f"\n{Fore.CYAN}💡 Open the HTML file in your browser to view results")
+    print(f"{Fore.GREEN}Report saved to: {Fore.WHITE}{output_file}")
+    print(f"\n{Fore.CYAN} Open the HTML file in your browser to view results")
 
 if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print(f"\n\n{Fore.YELLOW}⚠️  Scan interrupted by user")
+        print(f"\n\n{Fore.YELLOW}  Scan interrupted by user")
         sys.exit(0)
     except Exception as e:
-        print(f"\n{Fore.RED}❌ An unexpected error occurred: {e}")
+        print(f"\n{Fore.RED} An unexpected error occurred: {e}")
         if args.verbose:
             import traceback
             traceback.print_exc()
