@@ -60,7 +60,7 @@ def enumerate_dns(domain):
             
             print(f" {Fore.GREEN} Found {len(results[record_type])} records{Style.RESET_ALL}")
             
-            except dns.resolver.NoAnswer:
+        except dns.resolver.NoAnswer:
             print(f" {Fore.YELLOW}⚠️  No {record_type} records found{Style.RESET_ALL}")
             results[record_type] = []
             
@@ -78,7 +78,7 @@ def enumerate_dns(domain):
     
     # Get SOA record separately (special handling)
     try:
-        print("  📡 Querying SOA records...", end="")
+        print("   Querying SOA records...", end="")
         soa_answer = dns.resolver.resolve(domain, "SOA")
         if soa_answer:
             soa = soa_answer[0]
@@ -97,3 +97,70 @@ def enumerate_dns(domain):
         results["SOA"] = None
     
     return results
+
+def display_dns_results(results):
+    """Pretty print DNS results to the console."""
+    if not results:
+        return
+    
+    print(f"\n{Fore.CYAN}{'='*50}")
+    print(f"{Fore.GREEN}📊 DNS ENUMERATION RESULTS")
+    print(f"{Fore.CYAN}{'='*50}{Style.RESET_ALL}")
+    
+    # A Records
+    if results.get("A"):
+        print(f"\n{Fore.YELLOW} A Records (IPv4):{Style.RESET_ALL}")
+        for ip in results["A"]:
+            print(f"  → {ip}")
+    
+    # AAAA Records
+    if results.get("AAAA"):
+        print(f"\n{Fore.YELLOW} AAAA Records (IPv6):{Style.RESET_ALL}")
+        for ip in results["AAAA"]:
+            print(f"  → {ip}")
+    
+    # MX Records
+    if results.get("MX"):
+        print(f"\n{Fore.YELLOW}📧 MX Records (Mail Exchangers):{Style.RESET_ALL}")
+        for mx in results["MX"]:
+            print(f"  → Priority {mx['priority']}: {mx['exchange']}")
+    
+    # TXT Records
+    if results.get("TXT"):
+        print(f"\n{Fore.YELLOW}📝 TXT Records:{Style.RESET_ALL}")
+        for txt in results["TXT"]:
+            # Truncate long TXT records for display
+            display_txt = txt[:100] + "..." if len(txt) > 100 else txt
+            print(f"  → {display_txt}")
+    
+    # NS Records
+    if results.get("NS"):
+        print(f"\n{Fore.YELLOW}🌐 NS Records (Name Servers):{Style.RESET_ALL}")
+        for ns in results["NS"]:
+            print(f"  → {ns}")
+    
+    # CNAME Records
+    if results.get("CNAME"):
+        print(f"\n{Fore.YELLOW}🔗 CNAME Records (Aliases):{Style.RESET_ALL}")
+        for cname in results["CNAME"]:
+            print(f"  → {cname}")
+    
+    # SOA Record
+    if results.get("SOA"):
+        soa = results["SOA"]
+        print(f"\n{Fore.YELLOW}📋 SOA Record (Start of Authority):{Style.RESET_ALL}")
+        print(f"  → Primary NS: {soa['mname']}")
+        print(f"  → Responsible Email: {soa['rname']}")
+        print(f"  → Serial: {soa['serial']}")
+        print(f"  → Refresh: {soa['refresh']}s")
+        print(f"  → Retry: {soa['retry']}s")
+        print(f"  → Expire: {soa['expire']}s")
+        print(f"  → Minimum TTL: {soa['minimum']}s")
+
+if __name__ == "__main__":
+    # Test the module
+    test_domain = "example.com"
+    print(f"Testing DNS enumeration on {test_domain}...")
+    results = enumerate_dns(test_domain)
+    if results:
+        display_dns_results(results)
