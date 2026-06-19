@@ -59,3 +59,41 @@ def enumerate_dns(domain):
                     results[record_type].append(str(answer).rstrip('.'))
             
             print(f" {Fore.GREEN} Found {len(results[record_type])} records{Style.RESET_ALL}")
+            
+            except dns.resolver.NoAnswer:
+            print(f" {Fore.YELLOW}⚠️  No {record_type} records found{Style.RESET_ALL}")
+            results[record_type] = []
+            
+        except dns.resolver.NXDOMAIN:
+            print(f" {Fore.RED} Domain does not exist{Style.RESET_ALL}")
+            return None
+            
+        except dns.resolver.Timeout:
+            print(f" {Fore.RED} Timeout while querying {record_type}{Style.RESET_ALL}")
+            results[record_type] = []
+            
+        except dns.exception.DNSException as e:
+            print(f" {Fore.RED} DNS Error: {str(e)}{Style.RESET_ALL}")
+            results[record_type] = []
+    
+    # Get SOA record separately (special handling)
+    try:
+        print("  📡 Querying SOA records...", end="")
+        soa_answer = dns.resolver.resolve(domain, "SOA")
+        if soa_answer:
+            soa = soa_answer[0]
+            results["SOA"] = {
+                "mname": str(soa.mname).rstrip('.'),
+                "rname": str(soa.rname).rstrip('.'),
+                "serial": soa.serial,
+                "refresh": soa.refresh,
+                "retry": soa.retry,
+                "expire": soa.expire,
+                "minimum": soa.minimum
+            }
+            print(f" {Fore.GREEN} SOA record found{Style.RESET_ALL}")
+    except Exception as e:
+        print(f" {Fore.YELLOW}  No SOA record found: {str(e)}{Style.RESET_ALL}")
+        results["SOA"] = None
+    
+    return results
